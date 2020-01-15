@@ -36,6 +36,7 @@ class Smsroute(Resource):
         url = request.url
         signature = request.headers.get('X-Twilio-Signature')
         parameters = request.form.to_dict()
+        numberSize = 10
 
         if handler.authenticatesender(url, parameters, signature):
             # only accept requests from registered numbers
@@ -43,6 +44,10 @@ class Smsroute(Resource):
             messagesid = request.form['MessageSid']
             nummedia = request.form['NumMedia']
             from_ = request.form['From']
+
+            # phone numbers are saved without area code, US numbers only
+            if len(from_) > numberSize:
+                from_ = from_[len(from_)-numberSize:len(from_)]
 
             # returns status of processed content for twilio server in a TwiML format
             body, code = handler.processcontent(body, messagesid, nummedia, from_)
@@ -52,3 +57,8 @@ class Smsroute(Resource):
 
 
 api.add_resource(Smsroute, '/incoming')
+
+
+@app.route("/")
+def index():
+    return "Index", 200
