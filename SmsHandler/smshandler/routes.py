@@ -25,6 +25,8 @@ ToZip = The postal code of the recipient.
 ToCountry = The country of the recipient.
 '''
 
+handler = TwilioHandler(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN, config.TWILIO_NUMBER)
+
 
 @app.route("/incoming/", methods=['POST', 'GET'])
 def incoming():
@@ -33,7 +35,6 @@ def incoming():
 
     if request.method == 'POST':
         # authenticate
-        handler = TwilioHandler(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN, config.TWILIO_NUMBER)
         url = request.url
         signature = request.headers.get('X-Twilio-Signature')
         parameters = request.form.to_dict()

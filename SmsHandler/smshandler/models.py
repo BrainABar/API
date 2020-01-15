@@ -1,6 +1,5 @@
-from smshandler import db
 import datetime
-
+from smshandler import db
 
 class Phone(db.Model):
     __tablename__ = "phones"
