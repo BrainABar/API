@@ -1,8 +1,7 @@
 from flask import render_template, url_for, flash, redirect, request
 from flask_restful import Resource
 # from marshmallow import Schema, fields, pprint
-from smshandler import app, config
-from smshandler.twiliohandler import TwilioHandler
+from smshandler import app, handler
 
 '''
 MessagingSid/SmsSid = A 34 character unique identifier for the message. May be used to later retrieve this message from the REST API
@@ -24,8 +23,6 @@ ToState = The state or province of the recipient.
 ToZip = The postal code of the recipient.
 ToCountry = The country of the recipient.
 '''
-
-handler = TwilioHandler(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN, config.TWILIO_NUMBER)
 
 
 @app.route("/incoming/", methods=['POST', 'GET'])

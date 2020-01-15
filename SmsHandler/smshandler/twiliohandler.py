@@ -26,7 +26,7 @@ class TwilioHandler:
 
     def processcontent(self, body, messagesid, nummedia, from_):
 
-        response = None
+        response = Nonet
         device_id = None
 
         #device = db.session.query(Phone).filter(Phone.phone == from_)
