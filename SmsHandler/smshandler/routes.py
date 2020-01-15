@@ -34,8 +34,6 @@ class Smsroute(Resource):
         # authenticate
         handler = TwilioHandler(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN, config.TWILIO_NUMBER)
         url = request.url
-        index = url.find('://')
-        url = url[:index] + 's' + url[index:]  # only needed for testing since https is needed
         signature = request.headers.get('X-Twilio-Signature')
         parameters = request.form.to_dict()
 
