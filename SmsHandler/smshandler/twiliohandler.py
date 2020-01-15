@@ -40,8 +40,10 @@ class TwilioHandler:
             db.session.add(device)
             db.session.commit()
             device = Phone.query.filter_by(phone=from_).first()
-            device.stats.append(Statistics())
 
+        if device.stats is None:
+            device.stats.append(Statistics())
+            db.session.commit()
 
         # user exists or added to database
         if "begin" in body:
@@ -55,6 +57,9 @@ class TwilioHandler:
                 response = "Please navigate to sms section of bryanbar website to get more credits or for help" \
                            "\nContinuous spam will result in blacklist"
 
+        elif not device.freecredits:
+            response = "Reply with begin to get 10 free credits or visit bryanbar for more help"
+
         elif device.stats[0].credits > 0:
             if "test" in body:
                 response = "test body reply"
@@ -66,17 +71,13 @@ class TwilioHandler:
             else:
                 response = "Unrecognized command, reply with 'help' or visit bryanbar website and visit sms"
 
-        elif device.stats[0].credits <= 0:
-            response = "Please head over to bryanbar website to add more credits"
-
         else:
-            response = "Unknown error has occurred"
+            response = "Please head over to bryanbar website to add more credits or for help"
 
         device.messages.append(Message(body, response))
         self.createmessage(response, device.phone)
         device.stats[0].sent += 1
         device.stats[0].received += nummedia
-        db.session.add(device)
         db.session.commit()
 
         return '', 202
