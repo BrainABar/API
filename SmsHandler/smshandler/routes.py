@@ -1,7 +1,7 @@
 from flask import render_template, url_for, flash, redirect, request
 from flask_restful import Resource
 # from marshmallow import Schema, fields, pprint
-from smshandler import app, api, config
+from smshandler import app, config
 from smshandler.twiliohandler import TwilioHandler
 
 '''
@@ -26,11 +26,12 @@ ToCountry = The country of the recipient.
 '''
 
 
-class Smsroute(Resource):
-    def get(self):
+@app.route("/incoming/", methods=['POST', 'GET'])
+def incoming():
+    if request.method == 'GET':
         return '', 404
 
-    def post(self):
+    if request.method == 'POST':
         # authenticate
         handler = TwilioHandler(config.TWILIO_ACCOUNT_SID, config.TWILIO_AUTH_TOKEN, config.TWILIO_NUMBER)
         url = request.url
@@ -54,9 +55,6 @@ class Smsroute(Resource):
             return body, code
 
         return '', 404
-
-
-api.add_resource(Smsroute, '/incoming')
 
 
 @app.route("/")
