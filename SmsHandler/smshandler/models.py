@@ -10,7 +10,7 @@ class Phone(db.Model):
     verified = db.Column(db.Boolean, default=False)
     freecredits = db.Column(db.Boolean, default=False)
     blacklisted = db.Column(db.Boolean, default=False)
-    messages = db.relationship('Message', backref='number', lazy=True)
+    messages = db.relationship('Messages', backref='number', lazy=True)
     stats = db.relationship('Statistics', backref='owner', lazy=True)
 
     def __init__(self, phone):
@@ -26,14 +26,14 @@ class Messages(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     message = db.Column(db.String(140))
     reply = db.Column(db.String(140))
-    date = db.Column(db.DateTime, default=datetime.datetime.now())
+    date = db.Column(db.DateTime)
     number_id = db.Column(db.Integer, db.ForeignKey('phones.id'), nullable=False)
 
     def __init__(self):
         self.date = datetime.datetime.now()
 
     def __repr__(self):
-        return '<Message> %r, <Reply> %r' % self.message, self.reply
+        return '<Message> %r' % self.message
 
 
 class Statistics(db.Model):
@@ -46,7 +46,7 @@ class Statistics(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('phones.id'), nullable=False)
 
     def __repr__(self):
-        return '<Received> %r, <Sent> %r, <Credits> %r' % self.received, self.sent, self.credits
+        return '<Received> %r' % self.received
 
     def __init__(self):
         self.sent = 0

@@ -65,8 +65,6 @@ def incoming():
                 db.session.add(device)
                 db.session.commit()
                 device = Phone.query.filter_by(phone=from_).first()
-
-            if device.stats is None:
                 device.stats.append(Statistics())
                 db.session.commit()
 
@@ -99,11 +97,7 @@ def incoming():
             else:
                 response = "Please head over to bryanbar website to add more credits or for help"
 
-            msg = Messages()
-            msg.message = body
-            msg.reply = response
             handler.createmessage(response, device.phone)
-            device.messages.append(msg)
             device.stats[0].sent += 1
             device.stats[0].received += nummedia
             db.session.commit()
