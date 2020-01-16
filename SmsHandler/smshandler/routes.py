@@ -40,6 +40,8 @@ def incoming():
         signature = request.headers.get('X-Twilio-Signature')
         parameters = request.form.to_dict()
         numberSize = 10
+        response = None
+        device_id = None
 
         if handler.authenticatesender(url, parameters, signature):
             # only accept requests from registered numbers
@@ -51,11 +53,6 @@ def incoming():
             # phone numbers are saved without area code, US numbers only
             if len(from_) > numberSize:
                 from_ = from_[len(from_)-numberSize:len(from_)]
-
-            # returns status of processed content for twilio server in a TwiML format
-            body, code = handler.processcontent(body, messagesid, nummedia, from_)
-            response = None
-            device_id = None
 
             # device = db.session.query(Phone).filter(Phone.phone == from_)
             device = Phone.query.filter_by(phone=from_).first()
