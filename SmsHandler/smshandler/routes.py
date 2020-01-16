@@ -47,7 +47,7 @@ def incoming():
             # only accept requests from registered numbers
             body = request.form['Body']
             messagesid = request.form['MessageSid']
-            nummedia = request.form['NumMedia']
+            nummedia = int(request.form['NumMedia'])
             from_ = request.form['From']
 
             # phone numbers are saved without area code, US numbers only
@@ -67,7 +67,6 @@ def incoming():
                 device = Phone(from_)
                 db.session.add(device)
                 response = "Reply with begin to start using with 10 free credits"
-                db.session.commit()
 
             # user exists or added to database
             elif "begin" in body:
@@ -77,50 +76,33 @@ def incoming():
                                "\nGo to sms section of bryanbar website for more"
                     device.credits += 10
                     device.freecredits = True
-                    device.sent += 1
-                    device.received += nummedia
-                    db.session.commit()
 
                 else:
                     response = "Please navigate to sms section of bryanbar website to get more credits or for help" \
                                "\nContinuous spam will result in blacklist"
-                    device.sent += 1
-                    device.received += nummedia
-                    db.session.commit()
 
             elif not device.freecredits:
                 response = "Reply with begin to get 10 free credits or visit bryanbar for more help"
-                device.sent += 1
-                device.received += nummedia
-                db.session.commit()
 
             elif device.credits > 0:
                 if "test" in body:
                     response = "test body reply"
                     device.credits -= 1
-                    device.sent += 1
-                    device.received += nummedia
-                    db.session.commit()
 
                 elif "credits" in body:
                     response = "Credits under number: " + str(device.credits)
-                    device.sent += 1
-                    device.received += nummedia
-                    db.session.commit()
 
                 else:
                     response = "Unrecognized command, reply with 'help' or visit bryanbar website and visit sms"
-                    device.sent += 1
-                    device.received += nummedia
-                    db.session.commit()
 
             else:
                 response = "Please head over to bryanbar website to add more credits or for help"
-                device.sent += 1
-                device.received += nummedia
-                db.session.commit()
 
             handler.createmessage(response, device.phone)
+
+            device.sent += 1
+            device.received += nummedia
+            db.session.commit()
 
             return '', 202
 
