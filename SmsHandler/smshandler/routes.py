@@ -2,7 +2,7 @@ from flask import render_template, url_for, flash, redirect, request
 from flask_restful import Resource
 # from marshmallow import Schema, fields, pprint
 from smshandler import app, db, config
-from smshandler.models import Phone
+from smshandler.models import Phone, Messagesid
 from smshandler.twiliohandler import TwilioHandler
 
 '''
@@ -46,7 +46,7 @@ def incoming():
         if handler.authenticatesender(url, parameters, signature):
             # only accept requests from registered numbers
             body = request.form['Body']
-            messagesid = request.form['MessageSid']
+            messagesid = request.form['MessageSid']  # twilio automatically saves messages, retrieve with messagesid
             nummedia = int(request.form['NumMedia'])
             from_ = request.form['From']
 
@@ -54,7 +54,7 @@ def incoming():
             if len(from_) > numberSize:
                 from_ = from_[len(from_)-numberSize:len(from_)]
 
-            # device = db.session.query(Phone).filter(Phone.phone == from_)
+            # device = db.session.query(Phone).filter(Phone.phone == from_) Do similar
             device = Phone.query.filter_by(phone=from_).first()
             body = body.lower()
 
@@ -99,9 +99,11 @@ def incoming():
                 response = "Please head over to bryanbar website to add more credits or for help"
 
             handler.createmessage(response, device.phone)
-
             device.sent += 1
             device.received += nummedia
+            msg = Messagesid()
+            msg.sid_tag = messagesid
+            device.message_sids.append(msg)
             db.session.commit()
 
             return '', 202
