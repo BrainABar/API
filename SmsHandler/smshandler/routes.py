@@ -99,8 +99,11 @@ def incoming():
             else:
                 response = "Please head over to bryanbar website to add more credits or for help"
 
-            device.messages.append(Messages(body, response))
+            msg = Messages()
+            msg.message = body
+            msg.reply = response
             handler.createmessage(response, device.phone)
+            device.messages.append(msg)
             device.stats[0].sent += 1
             device.stats[0].received += nummedia
             db.session.commit()
