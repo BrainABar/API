@@ -5,7 +5,7 @@ from twilio.request_validator import RequestValidator
 class TwilioHandler:
 
     def __init__(self, account_sid,
-                 auth_token, from_, db):
+                 auth_token, from_):
         self.account_sid = account_sid
         self.auth_token = auth_token
         self.from_ = from_
