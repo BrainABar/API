@@ -20,7 +20,7 @@ class Phone(db.Model):
         return '<Phone> %r' % self.phone
 
 
-class Message(db.Model):
+class Messages(db.Model):
     __tablename__ = "messages"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -29,12 +29,11 @@ class Message(db.Model):
     date = db.Column(db.DateTime, default=datetime.datetime.now())
     number_id = db.Column(db.Integer, db.ForeignKey('phones.id'), nullable=False)
 
-    def __init__(self, message, reply):
-        self.message = message
-        self.reply = reply
+    def __init__(self):
+        self.date = datetime.datetime.now()
 
     def __repr__(self):
-        return '<Message> %r' % self.message
+        return '<Message> %r, <Reply> %r' % self.message, self.reply
 
 
 class Statistics(db.Model):
@@ -47,7 +46,7 @@ class Statistics(db.Model):
     user_id = db.Column(db.Integer, db.ForeignKey('phones.id'), nullable=False)
 
     def __repr__(self):
-        return '<Received> %r' % self.received
+        return '<Received> %r, <Sent> %r, <Credits> %r' % self.received, self.sent, self.credits
 
     def __init__(self):
         self.sent = 0

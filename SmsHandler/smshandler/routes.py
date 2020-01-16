@@ -2,7 +2,7 @@ from flask import render_template, url_for, flash, redirect, request
 from flask_restful import Resource
 # from marshmallow import Schema, fields, pprint
 from smshandler import app, db, config
-from smshandler.models import Phone, Message, Statistics
+from smshandler.models import Phone, Messages, Statistics
 from smshandler.twiliohandler import TwilioHandler
 
 '''
@@ -99,7 +99,7 @@ def incoming():
             else:
                 response = "Please head over to bryanbar website to add more credits or for help"
 
-            device.messages.append(Message(body, response))
+            device.messages.append(Messages(body, response))
             handler.createmessage(response, device.phone)
             device.stats[0].sent += 1
             device.stats[0].received += nummedia
