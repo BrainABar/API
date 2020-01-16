@@ -65,8 +65,6 @@ def incoming():
                 db.session.add(device)
                 db.session.commit()
                 device = Phone.query.filter_by(phone=from_).first()
-                device.stats.append(Statistics())
-                db.session.commit()
 
             # user exists or added to database
             if "begin" in body:
@@ -74,7 +72,7 @@ def incoming():
                     response = "10 credits applied," \
                                "\nSms send under char limit are free," \
                                "\nGo to sms section of bryanbar website for more"
-                    device.stats[0].credits += 10
+                    device.credits += 10
                     device.freecredits = True
                 else:
                     response = "Please navigate to sms section of bryanbar website to get more credits or for help" \
@@ -83,13 +81,13 @@ def incoming():
             elif not device.freecredits:
                 response = "Reply with begin to get 10 free credits or visit bryanbar for more help"
 
-            elif device.stats[0].credits > 0:
+            elif device.credits > 0:
                 if "test" in body:
                     response = "test body reply"
-                    device.stats[0].credits -= 1
+                    device.credits -= 1
 
                 elif "credits" in body:
-                    response = "Credits under number: " + str(device.stats[0].credits)
+                    response = "Credits under number: " + str(device.credits)
 
                 else:
                     response = "Unrecognized command, reply with 'help' or visit bryanbar website and visit sms"
@@ -98,8 +96,8 @@ def incoming():
                 response = "Please head over to bryanbar website to add more credits or for help"
 
             handler.createmessage(response, device.phone)
-            device.stats[0].sent += 1
-            device.stats[0].received += nummedia
+            device.sent += 1
+            device.received += nummedia
             db.session.commit()
 
             return '', 202
