@@ -10,3 +10,4 @@ class Config:
     TWILIO_ACCOUNT_SID = config.get('TWILIO_ACCOUNT_SID')
     TWILIO_AUTH_TOKEN = config.get('TWILIO_AUTH_TOKEN')
     TWILIO_NUMBER = config.get('TWILIO_NUMBER')
+    HERE_API_KEY = config.get('HERE_API_KEY')
