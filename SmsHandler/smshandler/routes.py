@@ -59,7 +59,7 @@ def incoming():
             # device = db.session.query(Phone).filter(Phone.phone == from_) Do similar
             device = Phone.query.filter_by(phone=from_).first()
             body = body.lower()
-            body = body.split(" ")
+            body = body.split(":")
 
             if device is not None:
                 device_id = device.id
@@ -73,7 +73,7 @@ def incoming():
 
             # user exists or added to database
             elif "begin" in body[0]:
-                if not device.free_credits:
+                if not device.free_credits or device.unlimited:
                     response = "10 credits applied," \
                                "\nSms send under char limit are free," \
                                "\nGo to sms section of bryanbar website for more"
@@ -87,9 +87,9 @@ def incoming():
             elif not device.free_credits:
                 response = "Reply with begin to get 10 free credits or visit bryanbar for more help"
 
-            elif device.credits > 0 or device.unlimited:
-                if "test" in body[0]:
-                    response = "test body reply"
+            elif device.credits > 0:
+                if "quote" in body[0]:
+                    response = "random quote here"
                     device.credits -= 1
 
                 elif "credits" in body[0]:
@@ -99,12 +99,18 @@ def incoming():
                     xypos = None  # will be a dictionary of Latitude and Longitude keys
                     search = ""  # string of users command
                     response = ""
+                    geo_api = herepy.GeocoderApi(config.HERE_API_KEY)
+                    loc = None
 
-                    if body[1].isdigit():
-                        geo_api = herepy.GeocoderApi(config.HERE_API_KEY)
-                        loc = geo_api.free_form(body[1] + " US")
+                    if len(body) >= 2:
 
-                        if loc.Response['View']:
+                        if len(body[1].split(" ")) == 1:  # single address assumed to be zip code, needs US to refine
+                            if body[1].isdigit():
+                                loc = geo_api.free_form(body[1] + " US")
+                        else:
+                            loc = geo_api.free_form(body[1])
+
+                        if len(loc.Response['View']) >= 1:
 
                             xypos = loc.Response['View'][0]['Result'][0]["Location"]["DisplayPosition"]
 
@@ -117,20 +123,23 @@ def incoming():
                             else:
                                 search = "food"
 
-                            place_api = herepy.PlacesApi(apikey)
+                            place_api = herepy.PlacesApi(config.HERE_API_KEY)
                             coor = [xypos['Latitude'], xypos['Longitude']]
-                            locresults = place_api.category_places_at(coor, search)
+                            locresults = place_api.onebox_search(coor, search)
 
                             if locresults.results['items']:
                                 for item in locresults.results['items']:
                                     tempstr = item['title']
 
                                     if len(response) + len(tempstr) <= 140:
-                                        tempstr += tempstr + '\n'
+                                        response += tempstr + '\n'
                                     else:
                                         break
 
-                                device.credits -= 1
+                            else:
+                                response = "No search results"
+
+                            device.credits -= 1
 
                         else:
                             response = "Check location, results returned nothing\n" \
